@@ -1,0 +1,116 @@
+// Settings object
+{
+    "activityType": "food",
+    "maxDistance": 5.0,
+    "hostLocation": [47.654167, -122.308056] // latitude and longitude // default to uw campus
+}
+
+// Activity object
+{
+    "id": "1", // string type
+    "name": "Mario's Excellent Italian Food",
+    "category": "italian",
+    "distance": 2.1,
+    "description": "This restaurant specializes in spicy meatballs and spaghetti. Lorem ipsum dolor sit amet....",
+    "budget": [5.0, 30.0], // [min, max] price in price 
+    "tags": ["vegan"],
+    "image_url": "https://conzensus.com/scraped_image/marios.jpg",
+    "externalLinks": {
+        "website": "https://mariositalian.com/", // not all of these will be available for each activity
+        "Google Maps": "https://maps.google.com/mariositalian",
+        "Yelp": "https://yelp.com/mariositalian"
+    }
+}
+
+// ------
+
+// from server: roomCreated
+// client has created WS connection
+// the server has made a room
+{
+    "event": "roomCreated",
+    "roomCode": "JWZX",
+    "settings": {} // same as Settings object
+}
+
+// from client: setSettings
+// host changes settings of lobby
+{
+    "method": "setSettings",
+    "settings": {} // same as Settings object
+}
+
+// from server: settingsStatus
+// server sends this if settings changed successfully
+{
+    "event": "settingsStatus",
+    "success": True
+}
+
+// from client: addPlayer
+{
+    "method": "addPlayer",
+    "roomCode": "JWZX",
+    "playerName": "Billy",
+    "character": "smileyface.jpg"
+}
+
+// from server: playerAdded
+{
+    "event": "playerAdded",
+    "playerName": "Billy",
+    "character": "smileyface.jpg",
+    "roomCode": "JWZX"
+}
+
+// from client: startGame
+{
+    "method": "startGame"
+}
+
+// from server: gameStarted
+{
+    "event": "gameStarted",
+    "availableCategories": ["italian", "mexican", "chinese", "ethiopian", "korean"]
+}
+
+// from client: selectCategories
+// client has voted on broad categories
+{
+    "method": "selectCategories",
+    "categories": ["italian", "mexican", "chinese"]
+}
+
+// from server: startVoting
+// server sends activities that players can vote on
+{
+    "event": "startVoting",
+    "availableCards": [{}, {}, {}] // 20 Activity objects in an array
+}
+
+// from server: stopVoting
+// server forces players to stop voting
+{
+    "event": "stopVoting",
+    "reason": "roomClosed"
+}
+
+// from client: castVote
+// player finished voting on one or more activities
+{
+    "method": "castVote",
+    "like": ["1", "4", "21"], // list of Activity IDs
+    "dislike": ["6", "93"], // list of Activity IDs
+    "veto": ["63"] // list of Activity IDs
+}
+
+// from server: sendResults
+{
+    "event": "sendResults",
+    "results" {
+                "1": {}, // same as a single activity object
+                "2": {}, // same as a single activity object
+                "3": {}  // same as a single activity object
+              }
+}
+
