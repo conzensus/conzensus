@@ -14,11 +14,11 @@
     "description": "This restaurant specializes in spicy meatballs and spaghetti. Lorem ipsum dolor sit amet....",
     "budget": [5.0, 30.0], // [min, max] price in price 
     "tags": ["vegan"],
-    "image_url": "https://conzensus.com/scraped_image/marios.jpg",
+    "imageUrl": "https://conzensus.com/scraped_image/marios.jpg",
     "externalLinks": {
         "website": "https://mariositalian.com/", // not all of these will be available for each activity
-        "Google Maps": "https://maps.google.com/mariositalian",
-        "Yelp": "https://yelp.com/mariositalian"
+        "googleMaps": "https://maps.google.com/mariositalian",
+        "yelp": "https://yelp.com/mariositalian"
     }
 }
 
