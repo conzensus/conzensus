@@ -1,10 +1,12 @@
 import Onboard from './onboarding';
+import Settings from './settings';
 
 function App() {
   return (
     <div className="App">
 
-      <Onboard />
+      {/*<Onboard />*/}
+      <Settings />
 
     </div>
   );
