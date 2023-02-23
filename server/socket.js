@@ -2,7 +2,7 @@ var { Server } = require("socket.io");
 
 function startSocket(server) {
 	const io = new Server(server, {
-		cors: { origin: "localhost:3000" },
+		cors: { origin: "http://localhost:3000" },
 	});
 	io.on("connection", (socket) => {
 		console.log(`⚡: ${socket.id} user just connected!`);
