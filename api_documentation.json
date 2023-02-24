@@ -10,6 +10,7 @@
     "id": "1", // string type
     "name": "Mario's Excellent Italian Food",
     "category": "italian",
+    "coordinates": [47.654167, -122.308056],
     "distance": 2.1,
     "description": "This restaurant specializes in spicy meatballs and spaghetti. Lorem ipsum dolor sit amet....",
     "budget": [5.0, 30.0], // [min, max] price in price 
