@@ -3,6 +3,8 @@ import Settings from './settings';
 import CharacterSelect from './createCharacter';
 import LobbyHost from './lobbyHost';
 
+import GuestJoin from './guestJoin';
+
 function App() {
   return (
     <div className="App">
@@ -10,7 +12,8 @@ function App() {
       {/* <Onboard />
       <Settings />
       <CharacterSelect /> */}
-      <LobbyHost />
+
+      <GuestJoin playerInfo={["shiori", "smile.img"]}/>
 
     </div>
   );
