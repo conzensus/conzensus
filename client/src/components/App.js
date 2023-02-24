@@ -2,6 +2,7 @@ import Onboard from './onboarding';
 import Settings from './settings';
 import CharacterSelect from './createCharacter';
 import LobbyHost from './lobbyHost';
+import LobbyGuest from './lobbyGuest';
 
 function App() {
   return (
@@ -9,8 +10,9 @@ function App() {
 
       {/* <Onboard />
       <Settings />
-      <CharacterSelect /> */}
-      <LobbyHost />
+      <CharacterSelect />
+      <LobbyHost /> */}
+      <LobbyGuest />
 
     </div>
   );
