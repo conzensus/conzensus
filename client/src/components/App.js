@@ -1,12 +1,16 @@
 import Onboard from './onboarding';
 import Settings from './settings';
+import CharacterSelect from './createCharacter';
+import LobbyHost from './lobbyHost';
 
 function App() {
   return (
     <div className="App">
 
-      {/*<Onboard />*/}
+      {/* <Onboard />
       <Settings />
+      <CharacterSelect /> */}
+      <LobbyHost />
 
     </div>
   );
