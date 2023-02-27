@@ -1,10 +1,10 @@
 var Settings = require('./settings.js');
 
 module.exports = class Room {
-  constructor(roomCode) {
+  constructor(roomCode, hostPlayerInfo) { 
     this.roomCode = roomCode;
-    this.playerList = [];
-    this.settings = new Settings();
+    this.playerList = [hostPlayerInfo];
+    this.settings = new Settings(); // Could add host location into settings here if we wanted
   }
 
   addPlayer(player) {

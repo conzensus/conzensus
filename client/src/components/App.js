@@ -6,6 +6,7 @@ import LobbyGuest from './lobbyGuest';
 
 import GuestJoin from './guestJoin';
 
+import TestSocket from '../socket/socketTesting';
 import React, { useEffect, useState } from 'react';
 import io from 'socket.io-client';
 
@@ -26,8 +27,13 @@ function App() {
       <Settings />
       <CharacterSelect />
       <LobbyHost />
-      <LobbyGuest /> */}
-      <GuestJoin playerInfo={["shiori", "smile.img"]}/>
+      <LobbyGuest />*/}
+      {/* <GuestJoin playerInfo={["shiori", "smile.img"]}/> */}
+      { socket ?
+        <TestSocket socket={socket}/>
+      :
+      <div>not connected</div>
+      }
 
     </div>
   );
