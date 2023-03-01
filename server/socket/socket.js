@@ -1,101 +1,108 @@
-var { Server } = require("socket.io");
-var Player = require('../game_logic/player.js');
-var Room = require('../game_logic/room')
+var Player = require("../game_logic/player.js");
+var Room = require("../game_logic/room");
 
+class SocketServer {
+  constructor(io) {
+    this.roomStates = {}; // hashmap keys: roomCode, values: room objects
+    this.sockets = {}; // hashmap keys: socket.id, values: {roomState: roomStateObj, playerObj: playerObject}
+    io.on("connection", (socket) => {
+      console.log("***: A user connected");
+      socket.on("createRoom", () => this.onCreateRoom(socket));
+      socket.on("joinRoom", (joinInfo) => this.onJoinRoom(socket, joinInfo));
+      socket.on("addPlayer", (playerInfo) =>
+        this.onAddPlayer(socket, playerInfo)
+      );
+      socket.on("removePlayer", () => this.onRemovePlayer(socket));
+      socket.on("setSettings", (settingsInfo) =>
+        this.onSetSettings(socket, settingsInfo)
+      );
+      socket.on("disconnect", () => this.onDisconnect(socket));
+    });
+  }
 
-function startSocket(server) {
-	const roomStates = {}; // hashmap keys: roomCode, values: room objects
-    const sockets = {};
+  onCreateRoom(socket) {
+    let roomCode = this.makeRoomCode(5);
+    while (this.roomStates[roomCode]) {
+      roomCode = this.makeRoomCode(5);
+    }
+    socket.join(roomCode);
 
-	const io = new Server(server, {
-		cors: { origin: "http://localhost:3000" },
-	});
-	io.on("connection", (socket) => {
-		console.log("***: A user connected");
-		socket.on('newRoom', function(hostInfo){
-            console.log("reached")
-            let roomCode = makeRoomCode(5);
-            while(roomStates[roomCode]) {
-                roomCode = makeRoomCode(5)
-            }
-            socket.join(roomCode);
+    this.roomStates[roomCode] = new Room(roomCode);
+    this.sockets[socket.id] = {
+      roomState: this.roomStates[roomCode],
+      playerObj: null,
+    };
 
-            let hostJSON = JSON.parse(hostInfo)
-            let hostPlayer = new Player(hostJSON.name, hostJSON.character)
-            
-            sockets[socket.id] = { roomCode: roomCode, playerObj: hostPlayer }
+    socket.emit("roomCreated", roomCode);
+    console.log(roomCode, " has been created ");
+  }
 
-            roomStates[roomCode] = new Room(roomCode, hostPlayer)
-            
-            socket.emit("returnRoomCode", roomCode)
-            console.log(`${hostJSON.name} has created and joined game "${roomCode}".`)
-        });
+  onJoinRoom(socket, joinInfo) {
+    let joinJSON = JSON.parse(joinInfo);
+    if (!this.roomStates[joinJSON.roomCode]) {
+      socket.emit("joinRoomStatus", false, joinJSON.roomCode);
+    } else {
+      this.sockets[socket.id] = {
+        roomState: this.roomStates[joinJSON.roomCode],
+        playerObj: null,
+      };
+      socket.join(joinJSON.roomCode);
+      socket.emit("joinRoomStatus", true, joinJSON.roomCode);
+      console.log("Join room: \n", this.roomStates[joinJSON.roomCode]);
+    }
+  }
 
-		socket.on('joinRoom', function(joinInfo){
-            let joinJSON = JSON.parse(joinInfo)
-            if (!roomStates[joinJSON.roomCode]) {
-                socket.emit("invalidRoomCode")
-            } else {
-                sockets[socket.id] = { roomCode: joinJSON.roomCode, playerObj: null }
-                socket.join(joinJSON.roomCode)
-                socket.emit("returnRoomCode", joinJSON.roomCode)
-                console.log(roomStates[joinJSON.roomCode])
-            }
-        });
+  onAddPlayer(socket, playerInfo) {
+    this.onRemovePlayer(socket);
+    let playerJSON = JSON.parse(playerInfo);
+    let playerObj = new Player(playerJSON.name, playerJSON.character);
+    this.sockets[socket.id].roomState.addPlayer(playerObj);
+    this.sockets[socket.id] = {
+      roomState: this.sockets[socket.id].roomState,
+      playerObj: playerObj,
+    };
+    console.log("Add player: \n", this.sockets[socket.id].roomState);
+  }
 
-        socket.on('addPlayer', function(playerInfo) {
-            let playerJSON = JSON.parse(playerInfo)
-            let playerObj = new Player(playerJSON.name, playerJSON.character)
-            roomStates[sockets[socket.id].roomCode].addPlayer(playerObj)
-            sockets[socket.id] = { roomCode: sockets[socket.id].roomCode, playerObj: playerObj }
-            console.log(roomStates[sockets[socket.id].roomCode])
-        });
+  onRemovePlayer(socket) {
+    let playerObj = this.sockets[socket.id].playerObj;
+    this.sockets[socket.id].roomState.removePlayer(playerObj);
+    console.log("Remove player: \n", this.sockets[socket.id].roomState);
+  }
 
+  onSetSettings(socket, settingsInfo) {
+    let settingsJSON = JSON.parse(settingsInfo);
+    let activityType = settingsJSON.activityType;
+    let maxDistance = settingsJSON.maxDistance;
+    let hostLocation = settingsJSON.hostLocation;
+    this.sockets[socket.id].roomState.editSettings(
+      activityType,
+      maxDistance,
+      hostLocation
+    );
+    console.log("SetSettings \n", this.sockets[socket.id].roomState);
+  }
 
-        socket.on('editSettings', function(settingsInfo) {
-            let settingsJSON = JSON.parse(settingsInfo)
-            let activityType = settingsJSON.activityType
-            let maxDistance = settingsJSON.maxDistance
-            let hostLocation = settingsJSON.hostLocation
-            roomStates[sockets[socket.id].roomCode].editSettings(activityType, maxDistance, hostLocation)
-            console.log(roomStates[sockets[socket.id].roomCode])
-        });
+  onDisconnect(socket) {
+    if (this.sockets[socket.id]) {
+      let playerObj = this.sockets[socket.id].playerObj;
 
+      this.sockets[socket.id].roomState.removePlayer(playerObj);
+      socket.leave(this.sockets[socket.id].roomState.roomCode);
+      delete this.sockets[socket.id];
+    }
+    console.log("🔥: A user disconnected");
+  }
 
-        // calculate broad categories, create only one overpass object at 
-        //                                  top of socket or input as parameter to method
-
-        // send 20 cards
-
-        // send voting results
-        //          return top 3 activities
-
-		socket.on("disconnect", () => {
-			disconnectSocketFromGame()
-			console.log("🔥: A user disconnected");
-		});
-
-        function disconnectSocketFromGame() {
-            if (sockets[socket.id]) {
-                let roomCode = sockets[socket.id].roomCode
-                let playerObj = sockets[socket.id].playerObj
-    
-                roomStates[roomCode].removePlayer(playerObj)
-                socket.leave(sockets[socket.id])
-                delete sockets[socket.id]
-            }
-        }
-	});
-}
-
-function makeRoomCode(length) {
-    var result = '';
-    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  makeRoomCode(length) {
+    var result = "";
+    var characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     var charactersLength = characters.length;
     for (var i = 0; i < length; i++) {
-       result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
     return result;
- }
+  }
+}
 
-module.exports = startSocket;
+module.exports = SocketServer;
