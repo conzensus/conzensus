@@ -12,15 +12,20 @@ module.exports = class Room {
     this.playerList = [];
     this.settings = new Settings(); // Could add host location into settings here if we wanted
 
+    this.host; // populated when first player is added
     this.activityCache; // once the game is started, this will be an array of all activities within the room's search range
   }
 
   /**
-   * Add a player to the Conzensus room
+   * Add a player to the Conzensus room. If they are first, they will be made host.
    * @param {Player} player Player to add
    */
   addPlayer(player) {
     this.playerList.push(player);
+
+    if (this.playerList.length == 0) {
+      this.host = player;
+    } 
   }
 
   /**
@@ -31,6 +36,9 @@ module.exports = class Room {
     var index = this.playerList.indexOf(player);
     if (index > -1) {
       this.playerList.splice(this.playerList.indexOf(player), 1);
+    }
+    if (index == 0) {
+      this.host = this.playerList[0];
     }
   }
 
