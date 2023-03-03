@@ -1,13 +1,19 @@
-function Onboard (){
+import { Link } from 'react-router-dom';
+
+function Onboard() {
   return (
-    <div>
+    <div className="test" id="hi">
       <header>conzensus</header>
 
-      <body>
-          <button type="button"> Create Lobby</button>
-          <br></br>
-          <button type="button"> Join</button>
-      </body>
+      <div>
+        <Link to="/settings" state={{ action: "set" }}>
+          <button type="button" aria-label="createLobby"> Create Lobby</button>
+        </Link>
+        <br />
+        <Link to="/selection" state={{ player: "guest" }}>
+          <button type="button" aria-label="joinLobby"> Join</button>
+        </Link>
+      </div>
     </div>
   )
 }
