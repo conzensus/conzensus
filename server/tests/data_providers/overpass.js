@@ -1,7 +1,7 @@
-let overpass = require("../../data_providers/overpass");
+let OverpassDataProvider = require("../../data_providers/overpass");
 
 async function overpassProviderReturnsActivities() {
-  let provider = new overpass.OverpassDataProvider();
+  let provider = new OverpassDataProvider();
 
   let activities = await provider.getActivitiesInRadius(
     "indoor",
@@ -10,7 +10,7 @@ async function overpassProviderReturnsActivities() {
     -122.31304749174053
   );
 
-  if (activities.length < 0) {
+  if (activities.length <= 0) {
     console.error("Failed test overpassProviderReturnsActivities(): Overpass data provider failed to return any Activities!");
   } else {
     console.log("Passed test overpassProviderReturnsActivities()")

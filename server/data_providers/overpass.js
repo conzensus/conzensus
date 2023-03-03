@@ -176,4 +176,4 @@ class OverpassDataProvider {
   }
 }
 
-module.exports.OverpassDataProvider = OverpassDataProvider;
+module.exports = OverpassDataProvider;
