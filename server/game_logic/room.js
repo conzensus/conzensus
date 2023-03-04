@@ -58,7 +58,12 @@ module.exports = class Room {
   async startGame() {
     let provider = this.#getBestDataProvider();
 
-    this.activityCache = await provider.getActivitiesInRadius();
+    this.activityCache = await provider.getActivitiesInRadius(
+      this.settings.activityType,
+      this.settings.maxDistance,
+      this.settings.hostLocation[0],
+      this.settings.hostLocation[1]
+      );
     let categories = this.#getBroadCategories(this.activityCache);
 
     return categories;
@@ -71,8 +76,8 @@ module.exports = class Room {
    */
   #getBroadCategories(activities) {
     let categories = new Set();
-    for (const activity in activities) {
-      this.categories.add(activity.category);
+    for (const activity of activities) {
+      categories.add(activity.category);
     }
     return categories;
   }
