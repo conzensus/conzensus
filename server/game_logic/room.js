@@ -21,11 +21,10 @@ module.exports = class Room {
    * @param {Player} player Player to add
    */
   addPlayer(player) {
-    this.playerList.push(player);
-
     if (this.playerList.length == 0) {
       this.host = player;
     } 
+    this.playerList.push(player);
   }
 
   /**
