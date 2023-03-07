@@ -85,9 +85,37 @@ module.exports = class Room {
    * @returns {Array<Activity>} Subset of activities
    */
   chooseCandidateActivities(activities, numActivities) {
-    // TODO: if we implement more strategy types than random, we should put them in a separate class or something
+    // TODO: if we implement more candidate selection strategies than random, we should start putting candidate selection strategies in a separate class or something
     const shuffled = activities.sort(() => 0.5 - Math.random());
     return shuffled.slice(numActivities - 1);
+  }
+
+  /**
+   * Sort the input Activity list by voter preference, removing vetos
+   * @param {Array<Vote>}       votes               A list of votes, one from each player
+   * @param {Array<Acitivites>} candidateActivities All candidate activites that players voted on
+   * @returns {Array<Activity>} Sorted list of Activities, with most preferred first and no vetos
+   */
+  getTopActivities(votes, candidateActivities) {
+    // tally up votes
+    // TODO: if we make an alternate way of tallying votes, we should start putting talling strategies in a separate class
+    let runningTally = {};
+    for (const vote of votes) {
+      for (const likedActivityId of vote["like"]) {
+        runningTally[likedActivityId] = runningTally[likedActivityId]++ || 1;
+      }
+      for (const dislikedActivityId of vote["dislike"]) {
+        runningTally[dislikedActivityId] = runningTally[dislikedActivityId]-- || -1;
+      }
+    }
+
+    // sort by tallies
+    let sorted = [...runningTally.keys()].sort((a, b) => runningTally(runningTally[b] - runningTally[a]));
+
+    // change Activity IDs into Activities
+    sorted.map(activityId => candidateActivities.find(activity => activity.id === activityId));
+
+    return sorted;
   }
 
   /**
