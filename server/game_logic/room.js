@@ -95,6 +95,7 @@ module.exports = class Room {
    * @param {Array<Vote>}       votes               A list of votes, one from each player
    * @param {Array<Acitivites>} candidateActivities All candidate activites that players voted on
    * @returns {Array<Activity>} Sorted list of Activities, with most preferred first and no vetos
+   * @throws If all candidate activities were vetoed
    */
   getTopActivities(votes, candidateActivities) {
     // tally up votes
@@ -107,6 +108,11 @@ module.exports = class Room {
       for (const dislikedActivityId of vote["dislike"]) {
         runningTally[dislikedActivityId] = runningTally[dislikedActivityId]-- || -1;
       }
+    }
+
+    // check if there are activities to return
+    if (Object.keys(runningTally).length === 0) {
+      throw new Error("All candidates activities were vetoed!");
     }
 
     // sort by tallies
