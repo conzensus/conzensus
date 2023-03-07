@@ -102,7 +102,7 @@ module.exports = class Room {
     let runningTally = {};
     for (const vote of votes) {
       for (const likedActivityId of vote["like"]) {
-        runningTally[likedActivityId] = runningTally[likedActivityId]++ || 1;
+        runningTally[likedActivityId] = runningTally[likedActivityId]++ || 1; // the tally for the activity is 1 if undefined in the runningTally and incremented otherwise 
       }
       for (const dislikedActivityId of vote["dislike"]) {
         runningTally[dislikedActivityId] = runningTally[dislikedActivityId]-- || -1;
