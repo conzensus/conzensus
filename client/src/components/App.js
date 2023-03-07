@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Routes, Route, Navigate, Link } from 'react-router-dom';
 
 import Onboard from './onboarding';
@@ -7,9 +7,7 @@ import CharacterSelect from './characterSelect';
 import LobbyHost from './lobbyHost';
 import LobbyGuest from './lobbyGuest';
 import GuestJoin from './guestJoin';
-
-import TestSocket from '../socket/socketTesting';
-import React, { useEffect, useState } from 'react';
+//import TestSocket from '../socket/socketTesting';
 import io from 'socket.io-client';
 
 function App() {
@@ -32,12 +30,12 @@ function App() {
         <Route path="/guestLobby" element={<LobbyGuest />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-
-      { socket ?
-        <TestSocket socket={socket}/>
-      :
-      <div>not connected</div>
-      }
+      {/* { socket ?
+      //   <TestSocket socket={socket}/>
+      // :
+      // <div>not connected</div>
+      // }
+      */}
     </div>
   );
 }
