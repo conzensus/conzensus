@@ -70,6 +70,26 @@ module.exports = class Room {
   }
 
   /**
+   * Filter activities by the set of broad categories
+   * @param {Array<String>} broadCategories Broad category filter
+   * @returns {Array<String>} Activities that match the broad categories
+   */
+  filterActivities(broadCategories) {
+    return this.activityCache.filter(activity => broadCategories.includes(activity.category))
+  }
+
+  /**
+   * Choose some number of activities from the activity set
+   * @param {Array<Activity>} activities Set of activities
+   * @param {number} numActivities Number of activities to return
+   * @returns {Array<Activity>} Subset of activities
+   */
+  chooseCandidateActivities(activities, numActivities) {
+    const shuffled = activities.sort(() => 0.5 - Math.random());
+    return shuffled.slice(numActivities - 1);
+  }
+
+  /**
    * Get the set of available broad categories that are in the given array of activities
    * @param {Array<Activity>} activities Array of activities
    * @returns {Set<String>} Set of broad categories
