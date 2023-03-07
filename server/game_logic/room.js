@@ -85,6 +85,7 @@ module.exports = class Room {
    * @returns {Array<Activity>} Subset of activities
    */
   chooseCandidateActivities(activities, numActivities) {
+    // TODO: if we implement more strategy types than random, we should put them in a separate class or something
     const shuffled = activities.sort(() => 0.5 - Math.random());
     return shuffled.slice(numActivities - 1);
   }
