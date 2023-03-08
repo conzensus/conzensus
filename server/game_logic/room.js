@@ -66,7 +66,7 @@ module.exports = class Room {
       );
     let categories = this.#getBroadCategories(this.activityCache);
 
-    return categories;
+    return Array.from(categories);
   }
 
   /**
@@ -116,12 +116,12 @@ module.exports = class Room {
     }
 
     // sort by tallies
-    let sorted = [...Object.keys(runningTally)].sort((a, b) => runningTally(runningTally[b] - runningTally[a]));
+    let sorted = [...Object.keys(runningTally)].sort((a, b) => runningTally[b] - runningTally[a]);
 
     // change Activity IDs into Activities
-    sorted.map(activityId => candidateActivities.find(activity => activity.id === activityId));
+    let topActivities = sorted.map(activityId => candidateActivities.find(activity => activity.id === activityId));
 
-    return sorted;
+    return topActivities;
   }
 
   /**
