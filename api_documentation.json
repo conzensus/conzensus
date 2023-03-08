@@ -132,7 +132,7 @@
 // from server: sendResults
 {
     "event": "sendResults",
-    "results" {
+    "results": {
                 "1": {}, // same as a single activity object
                 "2": {}, // same as a single activity object
                 "3": {}  // same as a single activity object

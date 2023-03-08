@@ -66,7 +66,62 @@ module.exports = class Room {
       );
     let categories = this.#getBroadCategories(this.activityCache);
 
-    return categories;
+    return Array.from(categories);
+  }
+
+  /**
+   * Filter activities by the set of broad categories
+   * @param {Array<String>} broadCategories Broad category filter
+   * @returns {Array<String>} Activities that match the broad categories
+   */
+  filterActivities(broadCategories) {
+    return this.activityCache.filter(activity => broadCategories.includes(activity.category))
+  }
+
+  /**
+   * Choose some number of activities from the activity set
+   * @param {Array<Activity>} activities Set of activities
+   * @param {number} numActivities Number of activities to return
+   * @returns {Array<Activity>} Subset of activities
+   */
+  chooseCandidateActivities(activities, numActivities) {
+    // TODO: if we implement more candidate selection strategies than random, we should start putting candidate selection strategies in a separate class or something
+    const shuffled = activities.sort(() => 0.5 - Math.random());
+    return shuffled.slice(numActivities - 1);
+  }
+
+  /**
+   * Sort the input Activity list by voter preference, removing vetos
+   * @param {Array<Vote>}       votes               A list of votes, one from each player
+   * @param {Array<Acitivites>} candidateActivities All candidate activites that players voted on
+   * @returns {Array<Activity>} Sorted list of Activities, with most preferred first and no vetos
+   * @throws If all candidate activities were vetoed
+   */
+  getTopActivities(votes, candidateActivities) {
+    // tally up votes
+    // TODO: if we make an alternate way of tallying votes, we should start putting talling strategies in a separate class
+    let runningTally = {};
+    for (const vote of votes) {
+      for (const likedActivityId of vote["like"]) {
+        runningTally[likedActivityId] = runningTally[likedActivityId]++ || 1; // the tally for the activity is 1 if undefined in the runningTally and incremented otherwise 
+      }
+      for (const dislikedActivityId of vote["dislike"]) {
+        runningTally[dislikedActivityId] = runningTally[dislikedActivityId]-- || -1;
+      }
+    }
+
+    // check if there are activities to return
+    if (Object.keys(runningTally).length === 0) {
+      throw new Error("All candidates activities were vetoed!");
+    }
+
+    // sort by tallies
+    let sorted = [...Object.keys(runningTally)].sort((a, b) => runningTally[b] - runningTally[a]);
+
+    // change Activity IDs into Activities
+    let topActivities = sorted.map(activityId => candidateActivities.find(activity => activity.id === activityId));
+
+    return topActivities;
   }
 
   /**
