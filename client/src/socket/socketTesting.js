@@ -16,7 +16,7 @@ function TestSocket({ socket }) {
     e.preventDefault();
     let roomCode = document.getElementById("roomCode").value;
     let joinInfo = { roomCode: roomCode };
-    socket.emit("joinRoom", JSON.stringify(joinInfo));
+    socket.emit("joinRoom", joinInfo);
   };
 
   const addPlayer = (e) => {
@@ -24,8 +24,12 @@ function TestSocket({ socket }) {
     let newPlayerName = document.getElementById("newPlayerName").value;
     let newPlayerCharacter =
       document.getElementById("newPlayerCharacter").value;
-    let playerInfo = { name: newPlayerName, character: newPlayerCharacter };
-    socket.emit("addPlayer", JSON.stringify(playerInfo), roomCode);
+    let addPlayerInfo = {
+      roomCode: roomCode,
+      playerName: newPlayerName,
+      character: newPlayerCharacter,
+    };
+    socket.emit("addPlayer", addPlayerInfo);
   };
 
   const removePlayer = (e) => {
@@ -44,14 +48,8 @@ function TestSocket({ socket }) {
       maxDistance: maxDistance,
       hostLocation: [hostLat, hostLong],
     };
-    socket.emit("setSettings", JSON.stringify(settingsInfo));
+    socket.emit("setSettings", settingsInfo);
   };
-
-  socket.on("roomCreated", (returnedRoomCode, returnedSettings) => {
-    setRoomCode(returnedRoomCode);
-    console.log("returned Settings: ", returnedSettings);
-    setInvalidRoomCode("");
-  });
 
   const startGame = (e) => {
     e.preventDefault();
@@ -60,12 +58,14 @@ function TestSocket({ socket }) {
 
   const selectCategories = (e) => {
     e.preventDefault();
-    socket.emit("selectCategories", ["restaurant"]);
+    let selectedCategories = { categories: ["restaurant"] };
+    socket.emit("selectCategories", selectedCategories);
   };
 
   const secondUserSelectCategories = (e) => {
     e.preventDefault();
-    socket.emit("selectCategories", ["cafe"]);
+    let selectedCategories = { categories: ["cafe"] };
+    socket.emit("selectCategories", selectedCategories);
   };
 
   const castVotes = (e) => {
@@ -75,7 +75,8 @@ function TestSocket({ socket }) {
       dislike: activities.slice(0, 3).map((act) => act.id),
       veto: activities.slice(10, 13).map((act) => act.id),
     };
-    socket.emit("castVotes", votes, activities);
+    let votingRequest = { votes: votes, activities: activities };
+    socket.emit("castVotes", votingRequest);
   };
 
   const secondUserCastVotes = (e) => {
@@ -85,12 +86,19 @@ function TestSocket({ socket }) {
       dislike: activities.slice(4, 7).map((act) => act.id),
       veto: activities.slice(7, 10).map((act) => act.id),
     };
-    socket.emit("castVotes", votes, activities);
+    let votingRequest = { votes: votes, activities: activities };
+    socket.emit("castVotes", votingRequest);
   };
 
-  socket.on("roomJoinStatus", (success, roomCode) => {
-    if (success) {
-      setRoomCode(roomCode);
+  socket.on("roomCreated", (response) => {
+    setRoomCode(response.roomCode);
+    console.log("returned Settings: ", response.settings);
+    setInvalidRoomCode("");
+  });
+
+  socket.on("roomJoinStatus", (response) => {
+    if (response.success) {
+      setRoomCode(response.roomCode);
       setInvalidRoomCode("");
     } else {
       setRoomCode("");
@@ -98,40 +106,32 @@ function TestSocket({ socket }) {
     }
   });
 
-  socket.on("playerAdded", (playerName, playerCharacter, roomCode) => {
-    console.log(
-      "playerAdded",
-      "name:",
-      playerName,
-      "character:",
-      playerCharacter,
-      "roomCode:",
-      roomCode
-    );
+  socket.on("playerAdded", (response) => {
+    console.log("playerAdded:", response);
   });
 
-  socket.on("playerRemoved", (success) => {
-    console.log("playerRemoved", success);
+  socket.on("playerRemoved", (response) => {
+    console.log("playerRemoved:", response.success);
   });
 
-  socket.on("gameStarted", (categories) => {
+  socket.on("gameStarted", (response) => {
     console.log("gameStarted");
-    console.log(categories);
+    console.log(response.availableCategories);
   });
 
   socket.on("awaitingLastPlayer", () => {
     console.log("awaitingLastPlayer");
   });
 
-  socket.on("startVoting", (chosenActivities) => {
+  socket.on("startVoting", (response) => {
     console.log("startVoting");
-    console.log(chosenActivities);
-    setActivities(chosenActivities);
+    console.log(response.availableCards);
+    setActivities(response.availableCards);
   });
 
-  socket.on("sendResults", (topActivities) => {
+  socket.on("sendResults", (response) => {
     console.log("sendResults");
-    console.log(topActivities);
+    console.log(response.results);
   });
 
   return (
@@ -206,7 +206,6 @@ function TestSocket({ socket }) {
       <br />
       <br />
       <br />
-
       <button onClick={secondUserSelectCategories} id="button">
         player2selectCategories
       </button>

@@ -22,8 +22,8 @@ class SocketServer {
       socket.on("selectCategories", (selectedCategories) =>
         this.onSelectCategories(io, socket, selectedCategories)
       );
-      socket.on("castVotes", (playerVotes, candidateActivities) =>
-        this.onCastVotes(io, socket, playerVotes, candidateActivities)
+      socket.on("castVotes", (voteRequest) =>
+        this.onCastVotes(io, socket, voteRequest.votes, voteRequest.activities)
       );
       socket.on("disconnect", () => this.onDisconnect(socket));
     });
@@ -42,73 +42,84 @@ class SocketServer {
       playerObj: null,
     };
 
-    socket.emit("roomCreated", roomCode, this.rooms[roomCode].settings);
+    let response = {
+      roomCode: roomCode,
+      settings: this.rooms[roomCode].settings,
+    };
+    socket.emit("roomCreated", response);
     console.log(roomCode, " has been created ");
   }
 
   onJoinRoom(socket, joinInfo) {
-    let joinJSON = JSON.parse(joinInfo);
-    if (!this.rooms[joinJSON.roomCode]) {
-      socket.emit("joinRoomStatus", false, joinJSON.roomCode);
+    let response = { success: false, roomCode: joinInfo.roomCode };
+    if (!this.rooms[joinInfo.roomCode]) {
+      socket.emit("joinRoomStatus", response);
     } else {
       this.sockets[socket.id] = {
-        roomObj: this.rooms[joinJSON.roomCode],
+        roomObj: this.rooms[joinInfo.roomCode],
         playerObj: null,
       };
-      socket.join(joinJSON.roomCode);
-      socket.emit("joinRoomStatus", true, joinJSON.roomCode);
-      console.log("Join room: \n", this.rooms[joinJSON.roomCode]);
+      socket.join(joinInfo.roomCode);
+
+      response.success = true;
+      socket.emit("joinRoomStatus", response);
+      console.log("Join room: \n", this.rooms[joinInfo.roomCode]);
     }
   }
 
   onAddPlayer(socket, playerInfo) {
     this.onRemovePlayer(socket);
-    let playerJSON = JSON.parse(playerInfo);
-    let playerObj = new Player(playerJSON.name, playerJSON.character);
+    let playerObj = new Player(playerInfo.playerName, playerInfo.character);
     this.sockets[socket.id].roomObj.addPlayer(playerObj);
     this.sockets[socket.id] = {
       roomObj: this.sockets[socket.id].roomObj,
       playerObj: playerObj,
     };
-    socket.emit(
-      "playerAdded",
-      playerObj.name,
-      playerObj.character,
-      this.sockets[socket.id].roomObj.roomCode
-    );
+    let response = {
+      playerName: playerObj.name,
+      character: playerObj.character,
+      roomCode: this.sockets[socket.id].roomObj.roomCode,
+    };
+    socket.emit("playerAdded", response);
     console.log("Add player: \n", this.sockets[socket.id].roomObj);
   }
 
   onRemovePlayer(socket) {
     let playerObj = this.sockets[socket.id].playerObj;
     this.sockets[socket.id].roomObj.removePlayer(playerObj);
+    let response = { success: true };
+    socket.emit("playerRemoved", response);
     console.log("Remove player: \n", this.sockets[socket.id].roomObj);
   }
 
   onSetSettings(socket, settingsInfo) {
-    let settingsJSON = JSON.parse(settingsInfo);
-    let activityType = settingsJSON.activityType;
-    let maxDistance = settingsJSON.maxDistance;
-    let hostLocation = settingsJSON.hostLocation;
+    let activityType = settingsInfo.activityType;
+    let maxDistance = settingsInfo.maxDistance;
+    let hostLocation = settingsInfo.hostLocation;
     this.sockets[socket.id].roomObj.editSettings(
       activityType,
       maxDistance,
       hostLocation
     );
-    socket.emit("settingsStatus", true);
+    let response = { success: true };
+    socket.emit("settingsStatus", response);
     console.log("SetSettings \n", this.sockets[socket.id].roomObj);
   }
 
   async onStartGame(io, socket) {
     let room = this.sockets[socket.id].roomObj;
     let availableCategories = await room.startGame();
-    io.in(room.roomCode).emit("gameStarted", availableCategories);
+
+    let response = { availableCategories: availableCategories };
+    io.in(room.roomCode).emit("gameStarted", response);
     console.log("Game started; room code:", room.roomCode);
   }
 
   onSelectCategories(io, socket, selectedCategories) {
     let room = this.sockets[socket.id].roomObj;
-    let lastPlayerToCall = room.aggregateCategories(selectedCategories);
+    let lastPlayerToCall = room.aggregateCategories(
+      selectedCategories.categories
+    );
     if (!lastPlayerToCall) {
       socket.emit("awaitingLastPlayer");
     } else {
@@ -121,7 +132,8 @@ class SocketServer {
         20
       );
       console.log("availableCards:", availableCards);
-      io.in(room.roomCode).emit("startVoting", availableCards);
+      let response = { availableCards: availableCards };
+      io.in(room.roomCode).emit("startVoting", response);
     }
   }
 
@@ -137,7 +149,8 @@ class SocketServer {
         candidateActivities
       );
       let top3 = topActivities.slice(0, 3);
-      io.in(room.roomCode).emit("sendResults", top3);
+      let response = { results: top3 };
+      io.in(room.roomCode).emit("sendResults", response);
     }
   }
 
