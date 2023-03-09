@@ -14,6 +14,11 @@ module.exports = class Room {
 
     this.host; // populated when first player is added
     this.activityCache; // once the game is started, this will be an array of all activities within the room's search range
+    this.broadCategories = {
+      playersCollectedFrom: 0,
+      broadCategoriesSet: new Set(),
+    }; // broadCategories[0] Counts how many players' broad categories have been collected, Set() stores their preferences
+    this.votes = [];
   }
 
   /**
@@ -70,12 +75,24 @@ module.exports = class Room {
   }
 
   /**
+   * Aggregate broad categories into a set based on each players preferences
+   * Calls filter activities once every players categories are included
+   * @param {Array<String>} selectedCategories by player
+   * @returns {Boolean} // True if they are they last player to add categories
+   */
+  aggregateCategories(selectedCategories) {
+    this.broadCategories.broadCategoriesSet.add(...selectedCategories);
+    this.broadCategories.playersCollectedFrom++;
+    return this.broadCategories.playersCollectedFrom == this.playerList.length;
+  }
+
+  /**
    * Filter activities by the set of broad categories
    * @param {Array<String>} broadCategories Broad category filter
    * @returns {Array<String>} Activities that match the broad categories
    */
   filterActivities(broadCategories) {
-    return this.activityCache.filter(activity => broadCategories.includes(activity.category))
+    return this.activityCache.filter(activity => broadCategories.has(activity.category))
   }
 
   /**
@@ -87,7 +104,17 @@ module.exports = class Room {
   chooseCandidateActivities(activities, numActivities) {
     // TODO: if we implement more candidate selection strategies than random, we should start putting candidate selection strategies in a separate class or something
     const shuffled = activities.sort(() => 0.5 - Math.random());
-    return shuffled.slice(numActivities - 1);
+    return shuffled.slice(0, numActivities);
+  }
+
+  /**
+   *
+   * @param {Array<Activity_ids>} votes // A single players array of votes
+   * @returns {Boolean} // True if they are they last player to submit votes
+   */
+  aggregateVotes(votes) {
+    this.votes.push(votes);
+    return this.votes.length == this.playerList.length;
   }
 
   /**
