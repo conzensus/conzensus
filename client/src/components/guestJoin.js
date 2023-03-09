@@ -11,6 +11,10 @@ function GuestJoin({ playerInfo }) {
     navigate(-1);
   }
   
+  function nextCard() {
+    navigate("/activityCard1");
+}
+
   return (
     <div>
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="backBtn" viewBox="0 0 16 16" onClick={goBack}>
@@ -24,7 +28,7 @@ function GuestJoin({ playerInfo }) {
       <h3>Insert Room Code</h3>
         <input type="roomCode"/>
           <br></br>
-        <button type="button" className="nextBtn">Next!</button>
+        <button type="button" className="nextBtn" onClick={nextCard}>Next!</button>
     </div>
   )
 }
