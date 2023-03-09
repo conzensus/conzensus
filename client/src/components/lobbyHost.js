@@ -8,7 +8,7 @@ export default function LobbyHost () {
   }
 
   function toStart() {
-    navigate("/activityCard1");
+    navigate("/countdown");
   }
 
   return (
