@@ -1,13 +1,12 @@
 var Player = require("../game_logic/player.js");
 var Room = require("../game_logic/room");
 var OverpassDataProvider = require("../data_providers/overpass");
-var FakeTestDataProvider = require("../tests/game_logic/fake_test_data_provider");
 
 class SocketServer {
   constructor(io) {
     this.rooms = {}; // hashmap keys: roomCode, values: room objects
     this.sockets = {}; // hashmap keys: socket.id, values: {roomObj: room Object, playerObj: playerObject}
-    this.dataProviders = [new FakeTestDataProvider()];
+    this.dataProviders = [new OverpassDataProvider()];
     io.on("connection", (socket) => {
       console.log("***: A user connected");
       socket.on("createRoom", () => this.onCreateRoom(socket));
