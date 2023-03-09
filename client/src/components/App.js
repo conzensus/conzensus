@@ -7,7 +7,7 @@ import CharacterSelect from './characterSelect';
 import LobbyHost from './lobbyHost';
 import LobbyGuest from './lobbyGuest';
 import GuestJoin from './guestJoin';
-import TestSocket from '../socket/socketTesting';
+//import TestSocket from '../socket/socketTesting';
 import io from 'socket.io-client';
 
 function App() {
@@ -21,7 +21,7 @@ function App() {
 
   return (
     <div className="App">
-      {/* <Routes>
+      <Routes>
         <Route path="/" element={<Onboard />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/selection" element={<CharacterSelect />} />
@@ -29,13 +29,13 @@ function App() {
         <Route path="/join" element={<GuestJoin playerInfo={["Jane", "smile.image"]}/>} />
         <Route path="/guestLobby" element={<LobbyGuest />} />
         <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes> */}
-      { socket ?
-        <TestSocket socket={socket}/>
-      :
-      <div>not connected</div>
-      }
-     
+      </Routes>
+      {/* { socket ?
+      //   <TestSocket socket={socket}/>
+      // :
+      // <div>not connected</div>
+      // }
+      */}
     </div>
   );
 }
