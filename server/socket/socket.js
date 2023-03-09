@@ -42,7 +42,7 @@ class SocketServer {
       playerObj: null,
     };
 
-    socket.emit("roomCreated", roomCode);
+    socket.emit("roomCreated", roomCode, this.rooms[roomCode].settings);
     console.log(roomCode, " has been created ");
   }
 
@@ -70,6 +70,12 @@ class SocketServer {
       roomObj: this.sockets[socket.id].roomObj,
       playerObj: playerObj,
     };
+    socket.emit(
+      "playerAdded",
+      playerObj.name,
+      playerObj.character,
+      this.sockets[socket.id].roomObj.roomCode
+    );
     console.log("Add player: \n", this.sockets[socket.id].roomObj);
   }
 
@@ -89,48 +95,49 @@ class SocketServer {
       maxDistance,
       hostLocation
     );
+    socket.emit("settingsStatus", true);
     console.log("SetSettings \n", this.sockets[socket.id].roomObj);
   }
 
   async onStartGame(io, socket) {
     let room = this.sockets[socket.id].roomObj;
-    console.log("1");
-    let categories = await room.startGame();
-    console.log("2");
-    io.in(room.roomCode).emit("gameStarted", categories);
-    console.log("roomCode:", room.roomCode);
+    let availableCategories = await room.startGame();
+    io.in(room.roomCode).emit("gameStarted", availableCategories);
+    console.log("Game started; room code:", room.roomCode);
   }
 
   onSelectCategories(io, socket, selectedCategories) {
     let room = this.sockets[socket.id].roomObj;
     let lastPlayerToCall = room.aggregateCategories(selectedCategories);
-    if (lastPlayerToCall) {
+    if (!lastPlayerToCall) {
+      socket.emit("awaitingLastPlayer");
+    } else {
       let filtered_activities = room.filterActivities(
         room.broadCategories.broadCategoriesSet
       );
-      console.log("filteredActivitites:", filtered_activities);
-      let chosenActivities = room.chooseCandidateActivities(
+      console.log("filteredActivities:", filtered_activities);
+      let availableCards = room.chooseCandidateActivities(
         filtered_activities,
         20
       );
-      console.log("chosenActivities:", chosenActivities);
-      io.in(room.roomCode).emit("startVoting", chosenActivities);
-    } else {
-      socket.emit("awaitingLastPlayer");
+      console.log("availableCards:", availableCards);
+      io.in(room.roomCode).emit("startVoting", availableCards);
     }
   }
 
   onCastVotes(io, socket, playerVotes, candidateActivities) {
     let room = this.sockets[socket.id].roomObj;
     let lastPlayerToVote = room.aggregateVotes(playerVotes);
-    if (lastPlayerToVote) {
+    if (!lastPlayerToVote) {
+      socket.emit("awaitingLastPlayer");
+    } else {
+      console.log(room.votes);
       let topActivities = room.getTopActivities(
         room.votes,
         candidateActivities
       );
-      io.in(room.roomCode).emit("sendResults", topActivities);
-    } else {
-      socket.emit("awaitingLastPlayer");
+      let top3 = topActivities.slice(0, 3);
+      io.in(room.roomCode).emit("sendResults", top3);
     }
   }
 

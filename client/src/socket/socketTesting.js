@@ -47,8 +47,9 @@ function TestSocket({ socket }) {
     socket.emit("setSettings", JSON.stringify(settingsInfo));
   };
 
-  socket.on("roomCreated", (returnedRoomCode) => {
+  socket.on("roomCreated", (returnedRoomCode, returnedSettings) => {
     setRoomCode(returnedRoomCode);
+    console.log("returned Settings: ", returnedSettings);
     setInvalidRoomCode("");
   });
 
@@ -62,12 +63,27 @@ function TestSocket({ socket }) {
     socket.emit("selectCategories", ["restaurant"]);
   };
 
+  const secondUserSelectCategories = (e) => {
+    e.preventDefault();
+    socket.emit("selectCategories", ["cafe"]);
+  };
+
   const castVotes = (e) => {
     e.preventDefault();
     let votes = {
-      like: ["test-3.2"],
-      dislike: ["test-3.1"],
-      veto: ["test-3.3"],
+      like: activities.slice(3, 10).map((act) => act.id),
+      dislike: activities.slice(0, 3).map((act) => act.id),
+      veto: activities.slice(10, 13).map((act) => act.id),
+    };
+    socket.emit("castVotes", votes, activities);
+  };
+
+  const secondUserCastVotes = (e) => {
+    e.preventDefault();
+    let votes = {
+      like: activities.slice(0, 5).map((act) => act.id),
+      dislike: activities.slice(4, 7).map((act) => act.id),
+      veto: activities.slice(7, 10).map((act) => act.id),
     };
     socket.emit("castVotes", votes, activities);
   };
@@ -80,6 +96,22 @@ function TestSocket({ socket }) {
       setRoomCode("");
       setInvalidRoomCode("roomCode not Valid");
     }
+  });
+
+  socket.on("playerAdded", (playerName, playerCharacter, roomCode) => {
+    console.log(
+      "playerAdded",
+      "name:",
+      playerName,
+      "character:",
+      playerCharacter,
+      "roomCode:",
+      roomCode
+    );
+  });
+
+  socket.on("playerRemoved", (success) => {
+    console.log("playerRemoved", success);
   });
 
   socket.on("gameStarted", (categories) => {
@@ -166,7 +198,17 @@ function TestSocket({ socket }) {
       <br />
       <br />
       <button onClick={selectCategories} id="button">
-        selectCategories
+        player1selectCategories
+      </button>
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+
+      <button onClick={secondUserSelectCategories} id="button">
+        player2selectCategories
       </button>
       <br />
       <br />
@@ -175,7 +217,16 @@ function TestSocket({ socket }) {
       <br />
       <br />
       <button onClick={castVotes} id="button">
-        castVotes
+        player1castVotes
+      </button>
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <button onClick={secondUserCastVotes} id="button">
+        player2castVotes
       </button>
       <br />
       <br />

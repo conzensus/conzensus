@@ -48,7 +48,8 @@
 
 {
     "event": "joinRoomStatus",
-    "success": true
+    "success": true,
+    "roomCode": "JWZX"
 }
 
 // from client: setSettings
@@ -73,7 +74,7 @@
     "character": "smileyface.jpg"
 }
 
-// from server: playerAdded
+// response from server: playerAdded
 {
     "event": "playerAdded",
     "playerName": "Billy",
@@ -86,6 +87,11 @@
 // the socket will remain connected
 {
     "event": "removePlayer"
+}
+// response from server: playerRemoved
+{
+    "event": "playerRemoved",
+    "success": true
 }
 
 // from client: startGame
@@ -123,7 +129,7 @@
 // from client: castVote
 // player finished voting on one or more activities
 {
-    "method": "castVote",
+    "method": "castVotes",
     "like": ["1", "4", "21"], // list of Activity IDs
     "dislike": ["6", "93"], // list of Activity IDs
     "veto": ["63"] // list of Activity IDs
