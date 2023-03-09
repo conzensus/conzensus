@@ -5,6 +5,7 @@ export default TestSocket;
 function TestSocket({ socket }) {
   const [roomCode, setRoomCode] = useState("null");
   const [invalidRoomCode, setInvalidRoomCode] = useState("");
+  const [activities, setActivities] = useState([]);
 
   const createRoom = (e) => {
     e.preventDefault();
@@ -35,12 +36,13 @@ function TestSocket({ socket }) {
   const setSettings = (e) => {
     e.preventDefault();
     let activityType = document.getElementById("activityType").value;
-    let maxDistance = document.getElementById("maxDistance").value;
-    let hostLocation = document.getElementById("hostLocation").value;
+    let maxDistance = 0 + document.getElementById("maxDistance").value * 1;
+    let hostLong = document.getElementById("hostLat").value * 1;
+    let hostLat = document.getElementById("hostLong").value * 1;
     let settingsInfo = {
       activityType: activityType,
       maxDistance: maxDistance,
-      hostLocation: hostLocation,
+      hostLocation: [hostLat, hostLong],
     };
     socket.emit("setSettings", JSON.stringify(settingsInfo));
   };
@@ -50,6 +52,26 @@ function TestSocket({ socket }) {
     setInvalidRoomCode("");
   });
 
+  const startGame = (e) => {
+    e.preventDefault();
+    socket.emit("startGame");
+  };
+
+  const selectCategories = (e) => {
+    e.preventDefault();
+    socket.emit("selectCategories", ["test-category-3"]);
+  };
+
+  const castVotes = (e) => {
+    e.preventDefault();
+    let votes = {
+      like: ["test-3.2"],
+      dislike: ["test-3.1"],
+      veto: ["test-3.3"],
+    };
+    socket.emit("castVotes", votes, activities);
+  };
+
   socket.on("roomJoinStatus", (success, roomCode) => {
     if (success) {
       setRoomCode(roomCode);
@@ -58,6 +80,26 @@ function TestSocket({ socket }) {
       setRoomCode("");
       setInvalidRoomCode("roomCode not Valid");
     }
+  });
+
+  socket.on("gameStarted", (categories) => {
+    console.log("gameStarted");
+    console.log(categories);
+  });
+
+  socket.on("awaitingLastPlayer", () => {
+    console.log("awaitingLastPlayer");
+  });
+
+  socket.on("startVoting", (chosenActivities) => {
+    console.log("startVoting");
+    console.log(chosenActivities);
+    setActivities(chosenActivities);
+  });
+
+  socket.on("sendResults", (topActivities) => {
+    console.log("sendResults");
+    console.log(topActivities);
   });
 
   return (
@@ -100,11 +142,47 @@ function TestSocket({ socket }) {
       <br />
       maxDistance: <input id="maxDistance" />
       <br />
-      hostLocation: <input id="hostLocation" />
+      hostLat: <input id="hostLat" />
+      <br />
+      <br />
+      hostLong: <input id="hostLong" />
       <br />
       <button onClick={setSettings} id="button">
-        Edit Character
+        Edit Settings
       </button>
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <button onClick={startGame} id="button">
+        startGame
+      </button>
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <button onClick={selectCategories} id="button">
+        selectCategories
+      </button>
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <button onClick={castVotes} id="button">
+        castVotes
+      </button>
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
     </div>
   );
 }

@@ -129,6 +129,12 @@
     "veto": ["63"] // list of Activity IDs
 }
 
+// from server: awaitingLastPlayer
+// called during aggregations when waiting for all players
+{
+    "method": "awaitingLastPlayer"
+}
+
 // from server: sendResults
 {
     "event": "sendResults",
