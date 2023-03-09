@@ -37,8 +37,8 @@ function TestSocket({ socket }) {
     e.preventDefault();
     let activityType = document.getElementById("activityType").value;
     let maxDistance = 0 + document.getElementById("maxDistance").value * 1;
-    let hostLong = document.getElementById("hostLat").value * 1;
-    let hostLat = document.getElementById("hostLong").value * 1;
+    let hostLong = document.getElementById("hostLong").value * 1;
+    let hostLat = document.getElementById("hostLat").value * 1;
     let settingsInfo = {
       activityType: activityType,
       maxDistance: maxDistance,
@@ -59,7 +59,7 @@ function TestSocket({ socket }) {
 
   const selectCategories = (e) => {
     e.preventDefault();
-    socket.emit("selectCategories", ["test-category-3"]);
+    socket.emit("selectCategories", ["restaurant"]);
   };
 
   const castVotes = (e) => {
