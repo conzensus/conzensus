@@ -13,6 +13,7 @@ import ActivityCard3 from './activityCard3';
 import Results from './results';
 //import TestSocket from '../socket/socketTesting';
 import io from 'socket.io-client';
+import Countdown from './countdown';
 
 function App() {
   const [socket, setSocket] = useState(null);
@@ -30,6 +31,7 @@ function App() {
         <Route path="/settings" element={<Settings />} />
         <Route path="/selection" element={<CharacterSelect />} />
         <Route path="/hostLobby" element={<LobbyHost />} />
+        <Route path="/countdown" element={<Countdown />} />
         <Route path="/join" element={<GuestJoin playerInfo={["Jane", "smile.image"]}/>} />
         <Route path="/guestLobby" element={<LobbyGuest />} />
         <Route path="/activityCard1" element={<ActivityCard1 cardInfo={["Tennis", "tennis.img", "racket sport played by two or four people"]}/>} />
