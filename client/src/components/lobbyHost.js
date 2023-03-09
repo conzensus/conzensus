@@ -8,7 +8,7 @@ export default function LobbyHost () {
   }
 
   function toStart() {
-    navigate("/");
+    navigate("/activityCard1");
   }
 
   return (
