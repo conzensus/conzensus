@@ -1,8 +1,12 @@
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState } from "react";
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 
-export default function LobbyHost () {
+export default function LobbyHost ({ socket }) {
+  const { state } = useLocation();
+  const roomCode = state.roomCode;
+  console.log(roomCode);
+
   const navigate = useNavigate();
-
   function goBack() {
     navigate(-1);
   }
@@ -19,7 +23,7 @@ export default function LobbyHost () {
 
       <section>
         <h3>Room Code:</h3>
-        <input readOnly placeholder="JWXZ"/>
+        <input readOnly placeholder={roomCode} />
         < AddPlayer />
         <div style={{marginBottom: 100}}>Will add players</div>
         <Link to="/settings" state={{ action: "edit" }}>
