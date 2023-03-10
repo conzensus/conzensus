@@ -12,24 +12,19 @@ export default function GuestJoin({ socket }) {
   function GoBack() {
     navigate(-1);
   }
-  
-  function nextCard() {
-    navigate("/activityCard1");
-}
 
   function ToLobby(e) {
-    socket.emit("joinRoom", JSON.stringify(joinInfo));
-    socket.on("joinRoomStatus", (success, roomCode) => {
-      if (success) {
+    socket.emit("joinRoom", joinInfo);
+    socket.on("joinRoomStatus", (response) => {
+      if (response.success) {
         setInvalidRoomCode("");
-        socket.emit("addPlayer", JSON.stringify(playerInfo), joinInfo.roomCode);
+        socket.emit("addPlayer", playerInfo);
         navigate("/guestLobby");
       } else {
         setInvalidRoomCode("roomCode not Valid");
       }
     });
   }
-
 
   let joinInfo = {
     roomCode: ""
@@ -40,7 +35,7 @@ export default function GuestJoin({ socket }) {
   }
 
 
-  let name = playerInfo.name;
+  let name = playerInfo.playerName;
   let image = playerInfo.character;
   return (
     <div>

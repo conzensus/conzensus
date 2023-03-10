@@ -28,15 +28,16 @@ export default function CreateCharacter( {socket} ) {
   }
 
   let playerInfo = {
-    name: "",
+    roomCode: "",
+    playerName: "",
     character: ""
   }
 
   const UpdateName = (e) => {
-    console.log(e.target.value)
-    playerInfo.name = e.target.value;
+    playerInfo.playerName = e.target.value;
   }
 
+  // *** FIX: button onClick not always responsive
   const UpdateCharacter = (e) => {
     console.log(e.target.id);
     playerInfo.character = e.target.id;
@@ -146,14 +147,15 @@ export default function CreateCharacter( {socket} ) {
 
 function NextPage({ socket, playerInfo, player, roomCode }) {
 
-  function AddPlayer(e) {
-    socket.emit("addPlayer", JSON.stringify(playerInfo), roomCode);
+  function addPlayer(e) {
+    playerInfo.roomCode = roomCode;
+    socket.emit("addPlayer", playerInfo);
   }
 
   if (player === "host") {
     return (
       <Link to="/hostLobby" state={{ roomCode: roomCode }}>
-        <button type="button" className="nextBtn" onClick={AddPlayer}>Next!</button>
+        <button type="button" className="nextBtn" onClick={addPlayer}>Next!</button>
       </Link>
     );
   } else {
