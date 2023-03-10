@@ -42,10 +42,10 @@ function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       {/* { socket ?
-      //   <TestSocket socket={socket}/>
-      // :
-      // <div>not connected</div>
-      // }
+        <TestSocket socket={socket}/>
+      :
+      <div>not connected</div>
+      }
       */}
     </div>
   );

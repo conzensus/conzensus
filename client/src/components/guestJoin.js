@@ -18,6 +18,7 @@ export default function GuestJoin({ socket }) {
     socket.on("joinRoomStatus", (response) => {
       if (response.success) {
         setInvalidRoomCode("");
+        console.log(response, " space ", playerInfo)
         socket.emit("addPlayer", playerInfo);
         navigate("/guestLobby");
       } else {
@@ -32,6 +33,7 @@ export default function GuestJoin({ socket }) {
 
   const UpdateCode = (e) => {
     joinInfo.roomCode = e.target.value;
+    playerInfo.roomCode = e.target.value;
   }
 
 

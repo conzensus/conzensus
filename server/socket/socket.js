@@ -12,7 +12,7 @@ class SocketServer {
       socket.on("createRoom", () => this.onCreateRoom(socket));
       socket.on("joinRoom", (joinInfo) => this.onJoinRoom(socket, joinInfo));
       socket.on("addPlayer", (playerInfo) =>
-        this.onAddPlayer(socket, playerInfo)
+        this.onAddPlayer(io, socket, playerInfo)
       );
       socket.on("removePlayer", () => this.onRemovePlayer(socket));
       socket.on("setSettings", (settingsInfo) =>
@@ -67,7 +67,7 @@ class SocketServer {
     }
   }
 
-  onAddPlayer(socket, playerInfo) {
+  onAddPlayer(io, socket, playerInfo) {
     this.onRemovePlayer(socket);
     let playerObj = new Player(playerInfo.playerName, playerInfo.character);
     this.sockets[socket.id].roomObj.addPlayer(playerObj);
@@ -80,7 +80,7 @@ class SocketServer {
       character: playerObj.character,
       roomCode: this.sockets[socket.id].roomObj.roomCode,
     };
-    socket.emit("playerAdded", response);
+    io.in(playerInfo.roomCode).emit("playerAdded", response);
     console.log("Add player: \n", this.sockets[socket.id].roomObj);
   }
 

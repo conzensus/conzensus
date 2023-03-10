@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 
 export default function LobbyHost ({ socket }) {
@@ -16,13 +16,23 @@ export default function LobbyHost ({ socket }) {
     navigate("/countdown");
   }
 
+  // useEffect(() => {
+  //   socket.once("playerAdded", (response) => {
+  //     console.log(response);
+  //     setPlayerCount(playerCount + 1);
+  //     // *** FIX: adding the player twice due to re-rendering
+  //     AddPlayer(response, playerCount);
+  //   });
+  //   return () => socket.off("playerAdded")
+  // },  []);
+
+
   socket.on("playerAdded", (response) => {
     console.log(response);
     setPlayerCount(playerCount + 1);
     // *** FIX: adding the player twice due to re-rendering
     AddPlayer(response, playerCount);
   });
-
 
   return (
     <div>
@@ -33,7 +43,7 @@ export default function LobbyHost ({ socket }) {
       <section>
         <h3>Room Code:</h3>
         <input readOnly placeholder={roomCode} />
-        <section id="playerList">
+        <section className="playerList">
           <p>{playerCount} joined</p>
         </section>
         <div style={{marginBottom: 100}}></div>
@@ -49,11 +59,14 @@ export default function LobbyHost ({ socket }) {
 }
 
 function AddPlayer(response, count) {
-  let placement = document.getElementById("playerList");
+  let placement = document.getElementsByClassName("playerList")[0];
+  console.log(placement);
+  let newId = response.playerName + count;
 
   let newPlayer = document.createElement("div");
   newPlayer.style.border = "solid";
-  newPlayer.id = response.playerName + count;
+  newPlayer.id = newId;
+
 
   let name = document.createElement("p");
   name.innerText = response.playerName;
@@ -65,6 +78,16 @@ function AddPlayer(response, count) {
 
   newPlayer.appendChild(character);
   placement.appendChild(newPlayer);
-  console.log(placement);
+  
+
+  let children = placement.children;
+  for (let i = 0; i < children.length; i++) {
+    console.log(children[i].id);
+    // if (children[i].id != newId) {
+      
+    // }
+  }
+
+  // console.log(placement);
 
 }
