@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import io from 'socket.io-client';
 import { Routes, Route, Navigate, Link } from 'react-router-dom';
 
 import Onboard from './onboarding';
@@ -12,8 +13,8 @@ import ActivityCard2 from './activityCard2';
 import ActivityCard3 from './activityCard3';
 import Results from './results';
 //import TestSocket from '../socket/socketTesting';
-import io from 'socket.io-client';
 import Countdown from './countdown';
+
 
 function App() {
   const [socket, setSocket] = useState(null);
@@ -27,13 +28,13 @@ function App() {
   return (
     <div className="App">
       <Routes>
-        <Route path="/" element={<Onboard />} />
-        <Route path="/settings" element={<Settings />} />
-        <Route path="/selection" element={<CharacterSelect />} />
-        <Route path="/hostLobby" element={<LobbyHost />} />
+        <Route path="/" element={<Onboard socket={socket} />} />
+        <Route path="/settings" element={<Settings socket={socket} />} />
+        <Route path="/selection" element={<CharacterSelect socket={socket} />} />
+        <Route path="/hostLobby" element={<LobbyHost socket={socket} />} />
         <Route path="/countdown" element={<Countdown />} />
-        <Route path="/join" element={<GuestJoin playerInfo={["Jane", "smile.image"]}/>} />
-        <Route path="/guestLobby" element={<LobbyGuest />} />
+        <Route path="/join" element={<GuestJoin socket={socket} />} />
+        <Route path="/guestLobby" element={<LobbyGuest socket={socket} />} />
         <Route path="/activityCard1" element={<ActivityCard1 cardInfo={["Tennis", "tennis.img", "racket sport played by two or four people"]}/>} />
         <Route path="/activityCard2" element={<ActivityCard2 cardInfo={["Swimming", "swim.img", "pool sport"]}/>} />
         <Route path="/activityCard3" element={<ActivityCard3 cardInfo={["Rock Climbing", "rc.img", "sport involving bouldering and climbing rocks"]}/>} />
