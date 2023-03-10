@@ -96,7 +96,7 @@ function TestSocket({ socket }) {
     setInvalidRoomCode("");
   });
 
-  socket.on("roomJoinStatus", (response) => {
+  socket.on("joinRoomStatus", (response) => {
     if (response.success) {
       setRoomCode(response.roomCode);
       setInvalidRoomCode("");
