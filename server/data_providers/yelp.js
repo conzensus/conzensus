@@ -79,12 +79,12 @@ class YelpDataProvider {
     let activity = {
       "id": "yelp-" + business.id,
       "name": business.name,
-      "category": "temp", // TODO: FILL ME IN!!!
+      "category": tags[0], // TODO: Since could be multiple categories, should we convert Activity.category to array type?
       "coordinates": [business.coordinates.latitude, business.coordinates.longitude],
       "distance": business.distance,
       "description": "No description available",  // TODO: get a description from somewhere. Maybe need to have a separate API call
       "budget": [0.0, 9999.99],                   // TODO:  convert from yelp's $$$ notation to actual number range
-      "tags": tags,                                 // TODO: OSM's tags don't seem to correspond to what we consider "tags"
+      "tags": tags,
       "imageUrl": business.image_url,
       "externalLinks": {
         "yelp": business.url
