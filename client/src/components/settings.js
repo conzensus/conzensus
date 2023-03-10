@@ -3,25 +3,18 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 
 function Settings({ socket }) {
   const [roomCode, setRoomCode] = useState("null");
-
-  // if (socket) {
-  //   socket.on("roomCreated", (returnedRoomCode) => {
-  //     console.log(returnedRoomCode);
-  //     setRoomCode(returnedRoomCode);
-  //   });
-  // } else {
-  //   console.log("Error: No room created")
-  // }
-
-  socket.on("roomCreated", (returnedRoomCode) => {
-    console.log(returnedRoomCode);
-    setRoomCode(returnedRoomCode);
-  });
-
   const { state } = useLocation();
   const action = state.action;
 
   const navigate = useNavigate();
+
+  if (socket) {
+    socket.on("roomCreated", (roomObj) => {
+      setRoomCode(roomObj.roomCode);
+    });
+  } else {
+    console.log("Error: No room created");
+  }
 
   function goBack() {
     navigate(-1);
@@ -41,7 +34,7 @@ function Settings({ socket }) {
   let settingsInfo = {
     activityType: activityList,
     maxDistance: 0,
-    hostLocation: "UVillage",
+    hostLocation: [0, 0],
   };
 
   const UpdateDistance = (e) => {
@@ -114,7 +107,7 @@ function NextPage({ socket, action, code, settings }) {
 
   if (action === "set") {
     const setSettings = (e) => {
-      socket.emit("setSettings", JSON.stringify(settings));
+      socket.emit("setSettings", settings);
     };
     return (
       <Link to="/selection" state={{ roomCode: code, player: "host" }}>
@@ -123,14 +116,13 @@ function NextPage({ socket, action, code, settings }) {
     )
   } else if (action === "edit") {
     const setSettings = (e) => {
-      socket.emit("setSettings", JSON.stringify(settings));
+      socket.emit("setSettings", settings);
       navigate(-1);
     };
     return (
       <button type="button" className="nextBtn" onClick={setSettings}>Save!</button>
     )
   }
-
 }
 
 

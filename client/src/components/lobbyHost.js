@@ -2,9 +2,10 @@ import React, { useState } from "react";
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 
 export default function LobbyHost ({ socket }) {
+  const [playerCount, setPlayerCount] = useState(0);
+
   const { state } = useLocation();
   const roomCode = state.roomCode;
-  console.log(roomCode);
 
   const navigate = useNavigate();
   function goBack() {
@@ -15,6 +16,14 @@ export default function LobbyHost ({ socket }) {
     navigate("/countdown");
   }
 
+  socket.on("playerAdded", (response) => {
+    console.log(response);
+    setPlayerCount(playerCount + 1);
+    // *** FIX: adding the player twice due to re-rendering
+    AddPlayer(response, playerCount);
+  });
+
+
   return (
     <div>
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="backBtn" viewBox="0 0 16 16" onClick={goBack}>
@@ -24,8 +33,10 @@ export default function LobbyHost ({ socket }) {
       <section>
         <h3>Room Code:</h3>
         <input readOnly placeholder={roomCode} />
-        < AddPlayer />
-        <div style={{marginBottom: 100}}>Will add players</div>
+        <section id="playerList">
+          <p>{playerCount} joined</p>
+        </section>
+        <div style={{marginBottom: 100}}></div>
         <Link to="/settings" state={{ action: "edit" }}>
           <button type="button" className="settingBtn">Room Settings</button>
         </Link>
@@ -37,11 +48,23 @@ export default function LobbyHost ({ socket }) {
   );
 }
 
-function AddPlayer() {
-  // Input?: player info
-  // Save player info in a array?
-  let playerCount = 3;
-  return (
-    <p>{playerCount} joined</p>
-  );
+function AddPlayer(response, count) {
+  let placement = document.getElementById("playerList");
+
+  let newPlayer = document.createElement("div");
+  newPlayer.style.border = "solid";
+  newPlayer.id = response.playerName + count;
+
+  let name = document.createElement("p");
+  name.innerText = response.playerName;
+  newPlayer.appendChild(name);
+
+  // Should be an img
+  let character = document.createElement("p");
+  character.innerText = response.character;
+
+  newPlayer.appendChild(character);
+  placement.appendChild(newPlayer);
+  console.log(placement);
+
 }
