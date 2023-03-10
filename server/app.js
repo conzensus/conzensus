@@ -4,6 +4,12 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
+// copy config defaults to config.json if it doesn't exist already
+var fs = require('fs');
+if (!fs.existsSync('config.json')) {
+  fs.copyFileSync('config-defaults.json', 'config.json', fs.constants.COPYFILE_EXCL)
+}
+
 var app = express(); // init express app
 
 // add websocket support
