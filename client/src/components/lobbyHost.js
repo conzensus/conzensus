@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, Link, useLocation } from 'react-router-dom';
+
+import AddPlayer from "./functions/addPlayer";
 
 export default function LobbyHost ({ socket }) {
   const [playerCount, setPlayerCount] = useState(0);
@@ -16,13 +18,23 @@ export default function LobbyHost ({ socket }) {
     navigate("/countdown");
   }
 
+  // useEffect(() => {
+  //   socket.once("playerAdded", (response) => {
+  //     console.log(response);
+  //     setPlayerCount(playerCount + 1);
+  //     // *** FIX: adding the player twice due to re-rendering
+  //     AddPlayer(response, playerCount);
+  //   });
+  //   return () => socket.off("playerAdded")
+  // },  []);
+
+
   socket.on("playerAdded", (response) => {
     console.log(response);
     setPlayerCount(playerCount + 1);
     // *** FIX: adding the player twice due to re-rendering
     AddPlayer(response, playerCount);
   });
-
 
   return (
     <div>
@@ -33,7 +45,7 @@ export default function LobbyHost ({ socket }) {
       <section>
         <h3>Room Code:</h3>
         <input readOnly placeholder={roomCode} />
-        <section id="playerList">
+        <section className="playerList">
           <p>{playerCount} joined</p>
         </section>
         <div style={{marginBottom: 100}}></div>
@@ -46,25 +58,4 @@ export default function LobbyHost ({ socket }) {
       </section>
     </div>
   );
-}
-
-function AddPlayer(response, count) {
-  let placement = document.getElementById("playerList");
-
-  let newPlayer = document.createElement("div");
-  newPlayer.style.border = "solid";
-  newPlayer.id = response.playerName + count;
-
-  let name = document.createElement("p");
-  name.innerText = response.playerName;
-  newPlayer.appendChild(name);
-
-  // Should be an img
-  let character = document.createElement("p");
-  character.innerText = response.character;
-
-  newPlayer.appendChild(character);
-  placement.appendChild(newPlayer);
-  console.log(placement);
-
 }

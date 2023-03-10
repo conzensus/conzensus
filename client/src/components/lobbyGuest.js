@@ -1,13 +1,23 @@
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-export default function LobbyHost () {
-  //Input of guest player?
+import AddPlayer from './functions/addPlayer';
+
+export default function LobbyHost({ socket }) {
+  const [playerCount, setPlayerCount] = useState(0);
 
   const navigate = useNavigate();
 
   function GoBack() {
     navigate(-1);
   }
+
+  socket.on("playerAdded", (response) => {
+    console.log(response);
+    setPlayerCount(playerCount + 1);
+    // *** FIX: adding the player twice due to re-rendering
+    AddPlayer(response, playerCount);
+  });
 
   return (
     <div>
@@ -19,19 +29,12 @@ export default function LobbyHost () {
         <h3>Conzensus Room: JWXZ</h3>
 
         <div style={{marginBottom: 100}}>Will add players</div>
-        <AddPlayer />
+        <section className="playerList">
+          <p>{playerCount} joined</p>
+        </section>
         <p>Waiting for host...</p>
 
       </section>
     </div>
-  );
-}
-
-function AddPlayer() {
-  // Input?: player info
-  // Save player info in a array?
-  let playerCount = 3;
-  return (
-    <p>{playerCount} joined</p>
   );
 }
