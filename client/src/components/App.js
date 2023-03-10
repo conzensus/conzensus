@@ -8,7 +8,6 @@ import CharacterSelect from './characterSelect';
 import LobbyHost from './lobbyHost';
 import LobbyGuest from './lobbyGuest';
 import GuestJoin from './guestJoin';
-import Test from './test';
 
 // import TestSocket from '../socket/socketTesting';
 
@@ -23,7 +22,6 @@ function App() {
 
   return (
     <div className="App">
-      {/* <Test /> */}
       <Routes>
         <Route path="/" element={<Onboard socket={socket} />} />
         <Route path="/settings" element={<Settings socket={socket} />} />
