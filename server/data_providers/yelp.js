@@ -60,6 +60,8 @@ class YelpDataProvider {
 	}
 
   #yelpBusinessAsActivity(business) {
+    let tags = business.categories.map(category => category.title);
+
     let activity = {
       "id": "yelp-" + business.id,
       "name": business.name,
@@ -68,7 +70,7 @@ class YelpDataProvider {
       "distance": business.distance,
       "description": "No description available",  // TODO: get a description from somewhere. Maybe need to have a separate API call
       "budget": [0.0, 9999.99],                   // TODO:  convert from yelp's $$$ notation to actual number range
-      "tags": [],                                 // TODO: OSM's tags don't seem to correspond to what we consider "tags"
+      "tags": tags,                                 // TODO: OSM's tags don't seem to correspond to what we consider "tags"
       "imageUrl": business.image_url,
       "externalLinks": {
         "yelp": business.url
