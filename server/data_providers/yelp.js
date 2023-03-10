@@ -5,6 +5,14 @@ const config = require("../config.json");
 const RATE_LIMIT_DAILY = 5000;
 const ENDPOINT = "https://api.yelp.com/v3";
 
+// TODO: refine these!!! some active category stuff are actually indoors etc.
+// see https://docs.developer.yelp.com/docs/resources-categories
+const CATEGORY_TYPES = {
+  "food": ["restaurants", "food"],
+  "outdoor": ["active"],
+  "indoor": ["arts", "museums", "musicvenues", "shopping"]
+}
+
 /**
  * Data provider which abstracts away Yelp Fusion API calls.
  * 
@@ -32,7 +40,8 @@ class YelpDataProvider {
       radius: meters,
       limit: 50,
       sort_by: "best_match",
-      open_now: "true"
+      open_now: "true",
+      categories: CATEGORY_TYPES[activityType]
 		});
 		let queryUrl = `${ENDPOINT}/businesses/search?${yelpQuery}`;
 
