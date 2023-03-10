@@ -97,6 +97,13 @@ class OverpassDataProvider {
   }
 
   /**
+   * Returns true if this data provider is available
+   */
+  isAvailable() {
+    return this.#getBestEndpoint() !== null;
+  }
+
+  /**
    * Transform OSM GeoJSON features into Conzensus Activity objects
    * @param {GeoJSON} feature GeoJSON representing a feature in OSM/Overpass
    * @returns {Activity} Conzensus Activity
@@ -169,4 +176,4 @@ class OverpassDataProvider {
   }
 }
 
-module.exports.OverpassDataProvider = OverpassDataProvider;
+module.exports = OverpassDataProvider;

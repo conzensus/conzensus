@@ -12,7 +12,7 @@ export default function LobbyHost ({ socket }) {
   }
 
   function toStart() {
-    navigate("/");
+    navigate("/countdown");
   }
 
   return (
