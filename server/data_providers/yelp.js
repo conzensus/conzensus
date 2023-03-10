@@ -68,6 +68,11 @@ class YelpDataProvider {
 		return this.requests < RATE_LIMIT_DAILY;
 	}
 
+  /**
+   * This turns a single Yelp Business JSON object into a Conzensus Activity
+   * @param {Object} business Yelp Business object
+   * @returns {Activity} Conzensus Activity
+   */
   #yelpBusinessAsActivity(business) {
     let tags = business.categories.map(category => category.title);
 
